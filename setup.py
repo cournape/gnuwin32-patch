@@ -1,3 +1,4 @@
+import hashlib
 import os.path
 import shutil
 import tempfile
@@ -29,6 +30,12 @@ def fetch_gnuwin32_patch(target):
         resp = requests.get(URL)
         with open(archive_target, "wb") as fp:
             fp.write(resp.content)
+
+        with open(archive_target, "rb") as fp:
+            h = hashlib.sha256()
+            h.update(fp.read())
+
+            assert h.hexdigest() == URL_SHA256, "sha256 mismatch"
 
         with zipfile.ZipFile(archive_target) as zp:
             a = zp.open("bin/patch.exe")
